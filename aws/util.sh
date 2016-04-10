@@ -14,4 +14,7 @@ report_success_or_failure () {
   fi
 }
 
-# export -f report_success_or_failure
+err_report() {
+  echo "Error on line $0:$1"
+}
+trap 'err_report $LINENO' ERR
