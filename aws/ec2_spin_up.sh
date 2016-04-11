@@ -32,12 +32,20 @@ launch_instances () {
 }
 
 get_public_ip () {
-  instance_public_ip="$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)"
-  report_success_or_failure $? 'public ip acquired' 'public ip not acquired'
+  echo 'waiting for instance to spin up'
+  while true ; do
+    instance_state="$(get_instance_state_by_id $instance_id)"
+    if [ $instance_state = 'running' ]; then
+      instance_public_dns_name="$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[0].Instances[0].PublicDnsName' --output text)"
+      report_success_or_failure $? 'public ip acquired' 'public ip not acquired'
+      break
+    fi
+  done
+  echo 'instance spun up'
 }
 
 ssh_into_instance () {
-  ssh -i $key_file_name $instance_user_name@$instance_public_ip
+  ssh -i $key_file_name $instance_user_name@$instance_public_dns_name
 }
 
 # main

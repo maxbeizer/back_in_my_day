@@ -22,8 +22,16 @@ revoke_security_group () {
 }
 
 delete_security_group () {
-  delete_security_group="$(aws ec2 delete-security-group --group-name devenv-sg)"
-  report_success_or_failure $? 'group deleted' 'group not deleted'
+  while true ; do
+    echo 'waiting for instance to terminate before deleting group'
+    instance_id="$(get_shutting_down_instance_id)"
+    instance_state="$(get_instance_state_by_id $instance_id)"
+    if [ $instance_state = 'terminated' ]; then
+      delete_security_group="$(aws ec2 delete-security-group --group-name devenv-sg)"
+      report_success_or_failure $? 'group deleted' 'group not deleted'
+      break
+    fi
+  done
 }
 
 terminate_running_instances () {
