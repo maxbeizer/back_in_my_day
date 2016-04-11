@@ -12,7 +12,7 @@ source util.sh
 delete_key () {
   aws ec2 delete-key-pair --key-name $key_name
   report_success_or_failure $? 'key deleted' 'key not deleted'
-  rm $key_file_name
+  rm -f $key_file_name
 }
 
 revoke_security_group () {
@@ -26,7 +26,18 @@ delete_security_group () {
   report_success_or_failure $? 'group deleted' 'group not deleted'
 }
 
+terminate_running_instances () {
+  aws ec2 describe-instances --query 'Reservations[*].Instances[*].[State.Name, InstanceId]' --output text |
+  grep running |
+  awk '{print $2}' |
+  while read line;
+  do aws ec2 terminate-instances --instance-ids $line
+  done > /dev/null
+  report_success_or_failure $? 'running instances terminated' 'running instances not terminated'
+}
+
 # main
+terminate_running_instances
 delete_key
 revoke_security_group
 delete_security_group

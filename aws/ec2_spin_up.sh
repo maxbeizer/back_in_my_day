@@ -26,8 +26,14 @@ create_key () {
   chmod 400 $key_file_name
 }
 
+launch_instances () {
+  instance_id="$(aws ec2 run-instances --image-id $ami_id --security-group-ids $security_group_id --count $instance_count --instance-type $instance_type --key-name $key_name --query 'Instances[0].InstanceId')"
+  report_success_or_failure $? 'instance created' 'instance not created'
+}
+
 # main
 create_security_group
 authorize_security_group
 create_key
+launch_instances
 
