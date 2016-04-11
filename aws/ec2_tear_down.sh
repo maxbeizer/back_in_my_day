@@ -33,7 +33,7 @@ terminate_running_instances () {
   while read line;
   do aws ec2 terminate-instances --instance-ids $line
   done > /dev/null
-  report_success_or_failure $? 'running instances terminated' 'running instances not terminated'
+  report_success_or_failure $? 'running instances terminating' 'running instances not terminating'
 }
 
 # main
