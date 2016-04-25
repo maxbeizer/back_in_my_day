@@ -12,17 +12,48 @@ class InstanceCreator
   end
 
   def call!
-    create_security_group
+    create_security_group; puts 'security group created'
+    authorize_security_group; puts 'security group authorized'
+    create_key_pair; puts 'key pair created'
+    launch_instances; puts "#{num_instances} #{pluralize(num_instances, 'instance')} launched"
   end
 
   private
+    def launch_instances
+      res = client.run_instances({
+        image_id: Constants::AMI_ID,
+        min_count: 1,
+        max_count: num_instances,
+        key_name: Constants::KEY_NAME,
+        security_groups: [Constants::SECURITY_GROUP_NAME],
+        instance_type: 't2.micro',
+        instance_initiated_shutdown_behavior: 'terminate'
+      })
+    end
+
+    def create_key_pair
+      client.create_key_pair(
+        Constants::KEY_PAIR_OPTIONS
+      )
+    rescue Aws::EC2::Errors::InvalidKeyPairDuplicate
+      nil
+    end
+
+    def authorize_security_group
+      client.authorize_security_group_ingress(
+        Constants::SECURITY_GROUP_INGRESS_OPTIONS
+      )
+    rescue Aws::EC2::Errors::InvalidPermissionDuplicate
+      nil
+    end
+
     def create_security_group
       client.create_security_group({
         group_name: Constants::SECURITY_GROUP_NAME,
         description: Constants::SECURITY_GROUP_DESCRIPTION
       })
     rescue Aws::EC2::Errors::InvalidGroupDuplicate
-      puts 'security group already exists'
+      nil
     end
 end
 
