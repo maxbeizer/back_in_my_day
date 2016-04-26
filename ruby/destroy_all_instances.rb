@@ -48,6 +48,10 @@ class InstanceDestroyer
       })
     rescue Aws::EC2::Errors::InvalidGroupNotFound
       nil
+    rescue Aws::EC2::Errors::DependencyViolation
+      puts 'Still terminating instances'
+      sleep 1
+      delete_security_group
     end
 end
 
