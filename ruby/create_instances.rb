@@ -6,7 +6,7 @@ class InstanceCreator
               :num_instances
 
   def initialize(client, num_instances)
-    @client = client
+    @client        = client
     @num_instances = num_instances
   end
 
@@ -15,10 +15,18 @@ class InstanceCreator
     authorize_security_group; puts 'security group authorized'
     create_key_pair; puts 'key pair created'
     chmod_key
-    launch_instances; puts "#{num_instances} instances launched"
+    launch_instances; puts "#{num_instances} instance launch requested"
+    print_post_script
   end
 
   private
+    def print_post_script
+      puts <<-DOC
+        Use check_instances.rb to get ip addresses and then
+        ssh -i back_in_my_day_key_pair ec2-user@ip_address
+      DOC
+    end
+
     def launch_instances
       res = client.run_instances({
         image_id: Constants::AMI_ID,

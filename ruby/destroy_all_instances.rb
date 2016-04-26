@@ -6,7 +6,7 @@ class InstanceDestroyer
               :resource
 
   def initialize(client)
-    @client = client
+    @client   = client
     @resource = Aws::EC2::Resource.new(client: client)
   end
 
@@ -56,8 +56,8 @@ class InstanceDestroyer
     rescue Aws::EC2::Errors::InvalidGroupNotFound
       nil
     rescue Aws::EC2::Errors::DependencyViolation
-      puts 'Still terminating instances'
-      sleep 1
+      puts 'Still terminating instances...'
+      sleep 2
       delete_security_group
     end
 end
