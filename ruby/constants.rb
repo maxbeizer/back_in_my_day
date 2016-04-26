@@ -13,5 +13,5 @@ module Constants
     key_name: KEY_NAME
   }
   AMI_ID = 'ami-08111162'
-  INSTANCE_INFO_FILE = './instance_info.txt'
+  INSTANCE_PRIVATE_KEY_FILE = './back_in_my_day.pem'
 end

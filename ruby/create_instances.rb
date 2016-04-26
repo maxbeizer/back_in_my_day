@@ -1,4 +1,3 @@
-require 'pry'
 require 'aws-sdk'
 require_relative 'constants'
 
@@ -15,7 +14,8 @@ class InstanceCreator
     create_security_group; puts 'security group created'
     authorize_security_group; puts 'security group authorized'
     create_key_pair; puts 'key pair created'
-    launch_instances; puts "#{num_instances} #{pluralize(num_instances, 'instance')} launched"
+    chmod_key
+    launch_instances; puts "#{num_instances} instances launched"
   end
 
   private
@@ -31,12 +31,25 @@ class InstanceCreator
       })
     end
 
+    def chmod_key
+      if File.exist? Constants::INSTANCE_PRIVATE_KEY_FILE
+        system "chmod 400 #{Constants::INSTANCE_PRIVATE_KEY_FILE}"
+      else
+        raise 'No private key found. Consider destroying all instances'
+      end
+    end
+
     def create_key_pair
-      client.create_key_pair(
+      res = client.create_key_pair(
         Constants::KEY_PAIR_OPTIONS
       )
+      File.open(Constants::INSTANCE_PRIVATE_KEY_FILE, 'w') do |f|
+        f.write res.key_material
+      end
     rescue Aws::EC2::Errors::InvalidKeyPairDuplicate
       nil
+    rescue Errno::EACCES
+      File.delete(Constants::INSTANCE_PRIVATE_KEY_FILE)
     end
 
     def authorize_security_group
