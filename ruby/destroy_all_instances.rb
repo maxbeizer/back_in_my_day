@@ -13,6 +13,7 @@ class InstanceDestroyer
   def call!
     terminate_instances; puts 'instances terminated'
     delete_key_pair; puts 'key pair deleted'
+    delete_local_key; puts 'local destroyed'
     revoke_security_group; puts 'group revoked'
     delete_security_group; puts 'group destroyed'
   end
@@ -26,6 +27,12 @@ class InstanceDestroyer
       client.terminate_instances({
         instance_ids: @instance_ids
       })
+    end
+
+    def delete_local_key
+      if File.exist? Constants::INSTANCE_PRIVATE_KEY_FILE
+        File.delete(Constants::INSTANCE_PRIVATE_KEY_FILE)
+      end
     end
 
     def delete_key_pair
