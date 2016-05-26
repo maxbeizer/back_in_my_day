@@ -17,6 +17,7 @@ class InstanceChecker
         id: #{instance.instance_id}
         state: #{instance.state.name}
         public_ip_address: #{instance.public_ip_address}
+        public_dns: #{instance.public_dns_name}
         ---
       RES
     end

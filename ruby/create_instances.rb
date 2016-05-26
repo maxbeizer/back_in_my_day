@@ -28,7 +28,7 @@ class InstanceCreator
     end
 
     def launch_instances
-      res = client.run_instances({
+      client.run_instances({
         image_id: Constants::AMI_ID,
         min_count: 1,
         max_count: num_instances,
