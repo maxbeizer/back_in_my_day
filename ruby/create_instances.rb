@@ -35,7 +35,8 @@ class InstanceCreator
         key_name: Constants::KEY_NAME,
         security_groups: [Constants::SECURITY_GROUP_NAME],
         instance_type: 't2.micro',
-        instance_initiated_shutdown_behavior: 'terminate'
+        instance_initiated_shutdown_behavior: 'terminate',
+        user_data: Constants::ENCODED_USER_DATA
       })
     end
 

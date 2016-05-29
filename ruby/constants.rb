@@ -1,3 +1,5 @@
+require 'base64'
+
 module Constants
   SECURITY_GROUP_NAME = 'back_in_my_day'
   SECURITY_GROUP_DESCRIPTION = 'back_in_my_day group from Ruby'
@@ -48,4 +50,13 @@ module Constants
   }
   AMI_ID = 'ami-08111162'
   INSTANCE_PRIVATE_KEY_FILE = './back_in_my_day.pem'
+  USER_DATA_SCRIPT = <<-RUBY
+    #!/bin/bash
+    yum install -y nginx
+    chkconfig nginx on
+    service nginx start
+    ip=$(/bin/hostname -i)
+    sed -i.bkp "/This page/i "$ip"" /usr/share/nginx/html/index.html
+  RUBY
+  ENCODED_USER_DATA = Base64.encode64 USER_DATA_SCRIPT
 end
