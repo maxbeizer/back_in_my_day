@@ -21,7 +21,7 @@ class InstanceTerminatorById
       puts 'Error terminating instances'
     end
 
-  rescue Aws::EC2::Errors::InvalidInstanceIDMalformed
+  rescue Aws::EC2::Errors::InvalidInstanceIDMalformed, Aws::EC2::Errors::InvalidInstanceIDNotFound
     puts 'Invalid id'
   end
 end
