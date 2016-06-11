@@ -59,4 +59,6 @@ module Constants
     sed -i.bkp "/This page/i "$ip"" /usr/share/nginx/html/index.html
   RUBY
   ENCODED_USER_DATA = Base64.encode64 USER_DATA_SCRIPT
+  HOSTED_ZONE_ID = 'ZB4XYQB60G7GX'
+  TARGET_SUBDOMAIN = 'bimd.maxbeizer.com'
 end
