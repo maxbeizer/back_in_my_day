@@ -1,4 +1,3 @@
-require 'pry'
 require 'aws-sdk'
 require_relative 'constants'
 
@@ -6,7 +5,11 @@ class InstanceChecker
   attr_reader :client,
               :resource
 
-  def initialize(client)
+  def self.get_public_ips_running
+    new.send :build_ip_array
+  end
+
+  def initialize(client = Aws::EC2::Client.new(region: 'us-east-1'))
     @client = client
     @resource = Aws::EC2::Resource.new(client: client)
   end
@@ -22,10 +25,17 @@ class InstanceChecker
       RES
     end
   end
+
+  private
+    def build_ip_array
+      Array(resource.instances)
+        .select { |instance| instance.state.name == 'running' }
+        .map(&:public_ip_address)
+    end
 end
 
-if ARGV.length > 0 || %w(--help -h).include?(ARGV[0])
-  puts 'usage destroy_all_instances.rb'
+if ARGV[0] == 'ips'
+  InstanceChecker.get_public_ips_running
 else
-  InstanceChecker.new(Aws::EC2::Client.new(region: 'us-east-1')).call!
+  InstanceChecker.new.call!
 end

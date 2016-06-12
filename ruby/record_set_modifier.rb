@@ -1,5 +1,6 @@
 require 'aws-sdk'
 require_relative 'constants'
+require_relative 'check_instances'
 
 class RecordSetModifier
   attr_reader :client,
@@ -51,6 +52,9 @@ end
 if ARGV.length == 0 || %w(--help -h).include?(ARGV[0])
   puts 'usage record_set_modifier.rb action ip'
   puts 'actions: UPSERT, DELETE'
+elsif ARGV[1] == 'all'
+  args = Array(ARGV[0]) + InstanceChecker.get_public_ips_running
+  RecordSetModifier.call!(args)
 else
   RecordSetModifier.call!(ARGV)
 end
