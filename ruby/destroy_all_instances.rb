@@ -1,5 +1,7 @@
 require 'aws-sdk'
 require_relative 'constants'
+require_relative 'record_set_modifier'
+require_relative 'check_instances'
 
 class InstanceDestroyer
   attr_reader :client,
@@ -11,6 +13,7 @@ class InstanceDestroyer
   end
 
   def call!
+    ensure_dns_updated; puts 'Updating DNS'
     terminate_instances; puts 'instances terminated'
     delete_key_pair; puts 'key pair deleted'
     delete_local_key; puts 'local destroyed'
@@ -27,6 +30,11 @@ class InstanceDestroyer
       client.terminate_instances({
         instance_ids: @instance_ids
       })
+    end
+
+    def ensure_dns_updated
+      args = Array('DELETE') + InstanceChecker.get_public_ips_running
+      RecordSetModifier.call!(args)
     end
 
     def delete_local_key
